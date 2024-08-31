@@ -3,9 +3,10 @@ import numpy as np
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.naive_bayes import GaussianNB
+import joblib
+
+
+
 
 file_folder = 'Data/M30_0420'
 
@@ -15,20 +16,19 @@ trails = trails_data['trails']
 
 
 # 读取label.mat文件
-label_data = scipy.io.loadmat('Output/label.mat')
-labels = label_data['labels2']
+label_data = scipy.io.loadmat(file_folder + '/label.mat')
+labels = label_data['labels']
 
-Neron_data = scipy.io.loadmat('Output/Nerons.mat')
-Neron_ind = Neron_data['selected_neurons_corr']
+Neron_data = scipy.io.loadmat(file_folder + '/Nerons.mat')
+Neron_ind = Neron_data['reliable_neurons']
 
-patched_Neron_data = scipy.io.loadmat('Output/patched_Nerons.mat')
-patched_Neron_ind = patched_Neron_data['indices']
+# patched_Neron_data = scipy.io.loadmat('Output/patched_Nerons.mat')
+# patched_Neron_ind = patched_Neron_data['indices']
 
 # 在 1 到 1495 之间随机抽取 20 个不重复的索引
-random_indices = np.random.choice(range(1, 1496), size=20, replace=False)
-print(patched_Neron_ind)
+# random_indices = np.random.choice(range(1, 1496), size=20, replace=False)
 
-# trails = trails[:,patched_Neron_ind[0]]
+# trails = trails[:,Neron_ind[0]]
 # trails = trails[:,random_indices]
 
 # 打印trails和labels的形状以确保正确加载
@@ -59,15 +59,15 @@ labels = labels.flatten()
 print(f"labels: {labels}")
 
 # 分割数据集为训练集和测试集
-X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.1, random_state=42)
 
 # 定义模型字典
 models = {
-    'SVM': svm.SVC(kernel='sigmoid'),
-    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
-    'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=42),
-    'Neural Network': MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=42),
-    'Naive Bayes': GaussianNB()
+    'SVM': svm.SVC(kernel='sigmoid')# ,
+    # 'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+    # 'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=42),
+    # 'Neural Network': MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=42),
+    # 'Naive Bayes': GaussianNB()
 }
 
 # 循环训练和评估模型
@@ -76,3 +76,7 @@ for model_name, model in models.items():
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     print(f"{model_name} Model accuracy: {accuracy * 100:.2f}%")
+
+# 保存模型到文件
+joblib.dump(model, file_folder + '/svm_model.joblib')
+print("模型已保存到 svm_model.joblib")
