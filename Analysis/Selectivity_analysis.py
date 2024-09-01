@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.io import loadmat
+from scipy.io import loadmat, savemat
 
 # 文件夹
 file_folder = 'Data/M30_0420'
@@ -44,3 +44,8 @@ selectivity_index = (mean_responses_1 - mean_responses_2) / denominator
 # 输出选择性指数
 print(selectivity_index)
 
+# 保存选择性指数为MAT文件
+output_filename = file_folder + '/selectivity_index.mat'
+savemat(output_filename, {'selectivity_index': selectivity_index})
+
+print(f"Selectivity index has been saved to {output_filename}")
