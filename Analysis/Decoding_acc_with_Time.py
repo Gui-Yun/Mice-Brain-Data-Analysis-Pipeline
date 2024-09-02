@@ -36,7 +36,7 @@ for num_windows in range(1, max_windows + 1):
         for j in range(trails.shape[1]):
             # 这里取 trails[i, j] 中前 current_length 个数据点
             trail_segment = trails[i, j].flatten()
-            trail_segment = trail_segment[-1-current_length:-1]
+            trail_segment = trail_segment[:current_length]
             data[i, j * current_length:(j + 1) * current_length] = trail_segment
 
     # 分割数据集为训练集和测试集
